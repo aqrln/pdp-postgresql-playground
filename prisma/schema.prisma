@@ -1,31 +1,29 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
-provider = "postgres"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  post_id   Int     @id @default(autoincrement())
-  content   String?
-  title     String
-  author_id Int?
-  author    User?   @relation(fields: [author_id], references: [user_id])
-}
-
-model Profile {
-  bio        String?
-  profile_id Int     @id @default(autoincrement())
-  user_id    Int
-  user       User    @relation(fields: [user_id], references: [user_id])
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+  output          = "../node_modules/.prisma/client"
 }
 
 model User {
-  email    String    @unique
-  name     String?
-  user_id  Int       @id @default(autoincrement())
-  posts    Post[]
-  profiles Profile[]
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+  posts Post[]
+  val   Int?
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
 }
